@@ -1,9 +1,11 @@
 import os
 import shutil
 from datetime import datetime
+import re #RegEx
+
 
 '''
-rename reports from: "Berichtsheft ddmmyy_ddmmyy.docx" or "Notizen Berichtsheft ddmmyy_ddmmyy.txt" to "YYYY-KWUU_ddmm-ddmm_Notizen_Berichtsheft.txt" or "YYYY-KWUU_ddmm-ddmm_Berichtsheft.docx" U is the calenderweek
+rename reports from: "Berichtsheft ddmmyy_ddmmyy.pdf" or "Notizen Berichtsheft ddmmyy_ddmmyy.txt" to "YYYY-KWUU_ddmm-ddmm_Notizen_Berichtsheft.txt" or "YYYY-KWUU_ddmm-ddmm_Berichtsheft.pdf" U is the calenderweek
 string format codes: https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
 '''
 source_folder_path: str = 'unprocessed_reports'
@@ -16,25 +18,38 @@ def get_file_names() -> list[str]:
 
 
 def rename_files(file_names: list[str]) -> None:
+
     for file_name in file_names:
-        new_name: str = construct_new_name(file_name)
-        print(f'{file_name} -> {new_name}')
-        shutil.copyfile(f'{source_folder_path}/{file_name}', f'{target_folder_path}/{new_name}')
+        try:
+            new_name: str = construct_new_name(file_name)
+            print(f'{file_name} -> {new_name}')
+            shutil.copyfile(f'{source_folder_path}/{file_name}', f'{target_folder_path}/{new_name}')
+        except ValueError as e:
+            print(f'{file_name} {e}')
+            continue
 
 
-def construct_new_name(file_name: str) -> str:
-    #TODO: handle .docx file ending
-    identifier: str =file_name[:-18].replace(' ','_') # e.g. Notizen Berichtsheft  or Berichtsheft    
+def construct_new_name(file_name: str) -> str:  
+
+    identifier: str = file_name[:-18].replace(' ','_') # e.g. Notizen Berichtsheft  or Berichtsheft    
     
     start_date: str = file_name[-17:-11]
     new_start_date_str: str | None = convert_date(start_date, True)
 
     end_date: str = file_name[-10:-4] 
     new_end_date_str: str | None= convert_date(end_date)
+    
+    file_extension: str =  fetch_file_extension(file_name)      
 
-    new_name: str = f'{new_start_date_str}-{new_end_date_str}_{identifier}.txt'
+    new_name: str = f'{new_start_date_str}-{new_end_date_str}_{identifier}{file_extension}'
     return new_name
     
+
+def fetch_file_extension(file_name):
+    pattern:re.Pattern = r"(\.\w+)$" # parenthesis group expressions, \. is "."  \w "word"-character, + one or more of the preceding token, $ end of string
+    result = re.search(pattern, file_name)
+    file_extension = result.group(1)
+    return file_extension
 
 
 def convert_date(old_date_str: str, is_start_date: bool|None = None) -> str | None:
@@ -50,7 +65,7 @@ def convert_date(old_date_str: str, is_start_date: bool|None = None) -> str | No
         new_date_str = datetime.strftime(old_date, new_date_format)
         return(new_date_str)
     except:
-        print(f'Unexpected Name')
+        raise ValueError('unexpected Name')
 
 
 if __name__=='__main__':    
