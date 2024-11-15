@@ -12,7 +12,6 @@ source_folder_path: str = 'unprocessed_reports'
 target_folder_path: str = 'processed_reports'
 
 def get_file_names() -> list[str]:
-    #validate file names
     file_names: list[str] = os.listdir(source_folder_path)
     return file_names
 
