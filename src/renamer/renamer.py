@@ -30,26 +30,32 @@ def rename_files(file_names: list[str]) -> None:
 
 
 def construct_new_name(file_name: str) -> str:  
+    #   4321098765432109876543210987654321       <--counting digit index backwards
+    #   Notizen Berichtsheft ddmmyy_ddmmyy.txt
+    #           Berichtsheft ddmmyy_ddmmyy.txt
+    file_extension: str =  fetch_file_extension(file_name)
+    len_fe: int= len(file_extension) #short name for better readability
 
-    identifier: str = file_name[:-18].replace(' ','_') # e.g. Notizen Berichtsheft  or Berichtsheft    
+    identifier: str = file_name[:-14-len_fe].replace(' ','_') # e.g. Notizen Berichtsheft  or Berichtsheft    
     
-    start_date: str = file_name[-17:-11]
+    start_date: str = file_name[-13-len_fe:-7-len_fe]    
     new_start_date_str: str | None = convert_date(start_date, True)
 
-    end_date: str = file_name[-10:-4] 
-    new_end_date_str: str | None= convert_date(end_date)
-    
-    file_extension: str =  fetch_file_extension(file_name)      
+    end_date: str = file_name[-6-len_fe:-len_fe]
+    new_end_date_str: str | None= convert_date(end_date)    
 
     new_name: str = f'{new_start_date_str}-{new_end_date_str}_{identifier}{file_extension}'
     return new_name
     
 
 def fetch_file_extension(file_name):
-    pattern:re.Pattern = r"(\.\w+)$" # parenthesis group expressions, \. is "."  \w "word"-character, + one or more of the preceding token, $ end of string
-    result = re.search(pattern, file_name)
-    file_extension = result.group(1)
-    return file_extension
+    try:
+        pattern:re.Pattern = r"(\.\w+)$" # parenthesis group expressions, \. is "."  \w is letters, numbers, and underscore, + one or more of the preceding token, $ end of string
+        result = re.search(pattern, file_name)
+        file_extension = result.group(1)
+        return file_extension
+    except AttributeError as e:
+        print(f'No matching pattern found.\nDoes the file have an extension?\n Error: {e}')
 
 
 def convert_date(old_date_str: str, is_start_date: bool|None = None) -> str | None:
@@ -65,7 +71,7 @@ def convert_date(old_date_str: str, is_start_date: bool|None = None) -> str | No
         new_date_str = datetime.strftime(old_date, new_date_format)
         return(new_date_str)
     except:
-        raise ValueError('unexpected Name')
+        raise ValueError('unexpected Name. is the Name in the Format: "Name ddmmyy_ddmmyy.txt" ?')
 
 
 if __name__=='__main__':    
