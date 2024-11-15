@@ -3,7 +3,7 @@ import shutil
 from datetime import datetime
 
 '''
-rename reports from: "Berichtsheft ddMMYY_ddMMYY" or "Notizen Berichtsheft ddMMYY_ddMMYY" to "KWUU_YY_MM_dd_Berichtsheft" or "KWUU_YY_MM_dd_Notizen_Berichtsheft" U is the calenderweek
+rename reports from: "Berichtsheft ddmmyy_ddmmyy.docx" or "Notizen Berichtsheft ddmmyy_ddmmyy.txt" to "YYYY-KWUU_ddmm-ddmm_Notizen_Berichtsheft.txt" or "YYYY-KWUU_ddmm-ddmm_Berichtsheft.docx" U is the calenderweek
 string format codes: https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
 '''
 source_folder_path: str = 'unprocessed_reports'
@@ -18,11 +18,12 @@ def get_file_names() -> list[str]:
 def rename_files(file_names: list[str]) -> None:
     for file_name in file_names:
         new_name: str = construct_new_name(file_name)
-        print(new_name)
-        #shutil.copyfile(f'{source_folder_path}/{file_name}', f'{target_folder_path}/{new_name}')
+        print(f'{file_name} -> {new_name}')
+        shutil.copyfile(f'{source_folder_path}/{file_name}', f'{target_folder_path}/{new_name}')
 
 
 def construct_new_name(file_name: str) -> str:
+    #TODO: handle .docx file ending
     identifier: str =file_name[:-18].replace(' ','_') # e.g. Notizen Berichtsheft  or Berichtsheft    
     
     start_date: str = file_name[-17:-11]
@@ -31,7 +32,7 @@ def construct_new_name(file_name: str) -> str:
     end_date: str = file_name[-10:-4] 
     new_end_date_str: str | None= convert_date(end_date)
 
-    new_name: str = f'{new_start_date_str}-{new_end_date_str}_{identifier}'
+    new_name: str = f'{new_start_date_str}-{new_end_date_str}_{identifier}.txt'
     return new_name
     
 
@@ -49,7 +50,7 @@ def convert_date(old_date_str: str, is_start_date: bool|None = None) -> str | No
         new_date_str = datetime.strftime(old_date, new_date_format)
         return(new_date_str)
     except:
-        print('Unexpected Name')   
+        print(f'Unexpected Name')
 
 
 if __name__=='__main__':    
