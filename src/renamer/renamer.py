@@ -9,29 +9,29 @@ string format codes: https://docs.python.org/3/library/datetime.html#strftime-an
 source_folder_path: str = 'unprocessed_reports'
 target_folder_path: str = 'processed_reports'
 
-def get_file_names():
+def get_file_names() -> list[str]:
     #validate file names
     file_names: list[str] = os.listdir(source_folder_path)
     return file_names
 
 
-def rename_files(file_names):
+def rename_files(file_names: list[str]) -> None:
     for file_name in file_names:
-        new_name = construct_new_name(file_name)
+        new_name: str = construct_new_name(file_name)
         print(new_name)
         #shutil.copyfile(f'{source_folder_path}/{file_name}', f'{target_folder_path}/{new_name}')
 
 
-def construct_new_name(file_name: str):
+def construct_new_name(file_name: str) -> str:
     identifier: str =file_name[:-18].replace(' ','_') # e.g. Notizen Berichtsheft  or Berichtsheft    
     
     start_date: str = file_name[-17:-11]
-    new_start_date_str = convert_date(start_date, True)
+    new_start_date_str: str | None = convert_date(start_date, True)
 
     end_date: str = file_name[-10:-4] 
-    new_end_date_str= convert_date(end_date)
+    new_end_date_str: str | None= convert_date(end_date)
 
-    new_name = f'{new_start_date_str}-{new_end_date_str}_{identifier}'
+    new_name: str = f'{new_start_date_str}-{new_end_date_str}_{identifier}'
     return new_name
     
 
