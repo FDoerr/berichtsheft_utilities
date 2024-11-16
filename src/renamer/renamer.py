@@ -3,11 +3,12 @@ import shutil
 from datetime import datetime
 import re #RegEx
 
-
 '''
 rename reports from: "Berichtsheft ddmmyy_ddmmyy.pdf" or "Notizen Berichtsheft ddmmyy_ddmmyy.txt" to "YYYY-KWUU_ddmm-ddmm_Notizen_Berichtsheft.txt" or "YYYY-KWUU_ddmm-ddmm_Berichtsheft.pdf" U is the calenderweek
 string format codes: https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
 '''
+#TODO: mess with from pathlib import Path
+
 source_folder_path: str = 'unprocessed_reports'
 target_folder_path: str = 'processed_reports'
 
@@ -24,6 +25,9 @@ def rename_files(file_names: list[str]) -> None:
             print(f'{file_name} -> {new_name}')
             shutil.copyfile(f'{source_folder_path}/{file_name}', f'{target_folder_path}/{new_name}')
         except ValueError as e:
+            print(f'{file_name} {e}')
+            continue
+        except AttributeError as e:
             print(f'{file_name} {e}')
             continue
 
@@ -54,9 +58,9 @@ def fetch_file_extension(file_name) -> str | None:
         pattern:re.Pattern      = r"(\.\w+)$" # parenthesis group expressions, \. is "."  \w is letters, numbers, and underscore, + one or more of the preceding token, $ end of string
         result:re.Match         = re.search(pattern, file_name)
         file_extension:str|None = result.group(1)
-        return file_extension
-    except AttributeError as e:
-        print(f'No matching pattern found.\nDoes the file have an extension?\n Error: {e}')
+        return file_extension        
+    except:
+        raise AttributeError('No matching pattern found in {file_name=}.\nDoes the file have an extension?')
 
 
 def convert_date(old_date_str: str, is_start_date: bool|None = None) -> str | None:
