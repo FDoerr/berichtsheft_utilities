@@ -11,11 +11,7 @@ string format codes: https://docs.python.org/3/library/datetime.html#strftime-an
 '''
 
 
-source_folder_path: str = 'unprocessed_reports'
-target_folder_path: str = 'processed_reports'
-
-
-def get_file_names() -> list[str]:
+def get_file_names(source_folder_path: str) -> list[str]:
     try:
         file_names: list[str] = os.listdir(source_folder_path)
         return file_names
@@ -24,7 +20,7 @@ def get_file_names() -> list[str]:
         sys.exit(0)
 
 
-def rename_files(file_names: list[str]) -> None:
+def rename_files(file_names: list[str], target_folder_path: str) -> None:
 
     for file_name in file_names:
         try:
@@ -86,6 +82,10 @@ def convert_date(old_date_str: str, is_start_date: bool|None = None) -> str | No
         raise ValueError(f'unexpected Name. is the Name in the Format: "Name ddmmyy_ddmmyy.txt" ?')
 
 
-if __name__=='__main__':    
-    file_names: list[str] = get_file_names()
-    rename_files(file_names)
+if __name__=='__main__':   
+
+    source_folder_path: str = 'unprocessed_reports' 
+    target_folder_path: str = 'processed_reports'
+
+    file_names: list[str] = get_file_names(source_folder_path)
+    rename_files(file_names, target_folder_path)
