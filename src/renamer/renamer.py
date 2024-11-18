@@ -4,9 +4,8 @@ import shutil
 from datetime import datetime
 import re #RegEx
 
-
-
 '''
+start from */berichtsheft_utilities/ with: py src/renamer/renamer.py
 rename reports from: "Berichtsheft ddmmyy_ddmmyy.pdf" or "Notizen Berichtsheft ddmmyy_ddmmyy.txt" to "YYYY-KWUU_ddmm-ddmm_Notizen_Berichtsheft.txt" or "YYYY-KWUU_ddmm-ddmm_Berichtsheft.pdf" U is the calenderweek
 string format codes: https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
 '''
@@ -16,12 +15,12 @@ source_folder_path: str = 'unprocessed_reports'
 target_folder_path: str = 'processed_reports'
 
 
-def get_file_names() -> list[str] | None:
+def get_file_names() -> list[str]:
     try:
         file_names: list[str] = os.listdir(source_folder_path)
         return file_names
     except FileNotFoundError as e:
-        print(f'Error: {e}\n-->Start the script while in the directory *\\berichtsheft_utilities\\')
+        print(f'Error: {e}\n--> Start the script while in the directory *\\berichtsheft_utilities\\')
         sys.exit(0)
 
 
@@ -30,7 +29,7 @@ def rename_files(file_names: list[str]) -> None:
     for file_name in file_names:
         try:
             new_name: str = construct_new_name(file_name)
-            print(f'{file_name} -> {new_name}')
+            print(f'{file_name} renamed to: {new_name}')
             shutil.copyfile(f'{source_folder_path}/{file_name}', f'{target_folder_path}/{new_name}')
         except ValueError as e:
             print(f'{file_name} {e}')
