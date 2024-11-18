@@ -1,20 +1,28 @@
+import sys
 import os
 import shutil
 from datetime import datetime
 import re #RegEx
 
+
+
 '''
 rename reports from: "Berichtsheft ddmmyy_ddmmyy.pdf" or "Notizen Berichtsheft ddmmyy_ddmmyy.txt" to "YYYY-KWUU_ddmm-ddmm_Notizen_Berichtsheft.txt" or "YYYY-KWUU_ddmm-ddmm_Berichtsheft.pdf" U is the calenderweek
 string format codes: https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
 '''
-#TODO: mess with from pathlib import Path
+
 
 source_folder_path: str = 'unprocessed_reports'
 target_folder_path: str = 'processed_reports'
 
-def get_file_names() -> list[str]:
-    file_names: list[str] = os.listdir(source_folder_path)
-    return file_names
+
+def get_file_names() -> list[str] | None:
+    try:
+        file_names: list[str] = os.listdir(source_folder_path)
+        return file_names
+    except FileNotFoundError as e:
+        print(f'Error: {e}\n-->Start the script while in the directory *\\berichtsheft_utilities\\')
+        sys.exit(0)
 
 
 def rename_files(file_names: list[str]) -> None:
@@ -33,12 +41,12 @@ def rename_files(file_names: list[str]) -> None:
 
 
 def construct_new_name(file_name: str) -> str:  
-    # this could probably be done with a RegEx
+    # TODO: this could probably be done with a RegEx
     #   4321098765432109876543210987654321       <--counting digit index backwards
     #   Notizen Berichtsheft ddmmyy_ddmmyy.txt
     #           Berichtsheft ddmmyy_ddmmyy.txt
     
-    file_extension: str =  fetch_file_extension(file_name)
+    file_extension: str = fetch_file_extension(file_name)
     len_ext: int= len(file_extension) # short name for better readability
 
     identifier: str = file_name[:-14-len_ext].replace(' ','_') # e.g. Notizen Berichtsheft  or Berichtsheft    
@@ -55,12 +63,12 @@ def construct_new_name(file_name: str) -> str:
 
 def fetch_file_extension(file_name) -> str | None:
     try:
-        pattern:re.Pattern      = r"(\.\w+)$" # parenthesis group expressions, \. is "."  \w is letters, numbers, and underscore, + one or more of the preceding token, $ end of string
+        pattern:re.Pattern      = r"(\.\w+)$" # parenthesis group expressions, \. is "."  \w is letters, numbers, and underscores, + one or more of the preceding token, $ end of string
         result:re.Match         = re.search(pattern, file_name)
         file_extension:str|None = result.group(1)
         return file_extension        
     except:
-        raise AttributeError('No matching pattern found in {file_name=}.\nDoes the file have an extension?')
+        raise AttributeError(f'No matching pattern found in {file_name=}.\nDoes the file have an extension?')
 
 
 def convert_date(old_date_str: str, is_start_date: bool|None = None) -> str | None:
@@ -76,7 +84,7 @@ def convert_date(old_date_str: str, is_start_date: bool|None = None) -> str | No
         new_date_str:str   = datetime.strftime(old_date,     new_date_format)
         return(new_date_str)
     except:
-        raise ValueError('unexpected Name. is the Name in the Format: "Name ddmmyy_ddmmyy.txt" ?')
+        raise ValueError(f'unexpected Name. is the Name in the Format: "Name ddmmyy_ddmmyy.txt" ?')
 
 
 if __name__=='__main__':    
