@@ -6,7 +6,7 @@ import re #RegEx
 
 '''
 start from */berichtsheft_utilities/ with: py src/renamer/renamer.py
-rename reports from: "Berichtsheft ddmmyy_ddmmyy.pdf" or "Notizen Berichtsheft ddmmyy_ddmmyy.txt" to "YYYY-KWUU_ddmm-ddmm_Notizen_Berichtsheft.txt" or "YYYY-KWUU_ddmm-ddmm_Berichtsheft.pdf" U is the calenderweek
+rename reports from: "Berichtsheft ddmmyy_ddmmyy.pdf" or "Notizen Berichtsheft ddmmyy_ddmmyy.txt" to "YYYY-KWVV_ddmm-ddmm_Notizen_Berichtsheft.txt" or "YYYY-KWVV_ddmm-ddmm_Berichtsheft.pdf" V is the calenderweek
 string format codes: https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
 '''
 
@@ -71,7 +71,7 @@ def convert_date(old_date_str: str, is_start_date: bool|None = None) -> str | No
         old_date_format: str = '%d%m%y'
 
         if is_start_date:
-            new_date_format: str = '%Y-KW%U_%d%m'
+            new_date_format: str = '%Y-KW%V_%d%m'
         else: 
             new_date_format: str = '%d%m'
         
